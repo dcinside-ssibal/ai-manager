@@ -1,70 +1,67 @@
-AI-MANAGER
-==========
+# AI-MANAGER
 
-개요
-----
-AI-MANAGER는 특정 마이너 갤러리의 게시물을 모니터링하고, 부적절하다고 판단되는 게시물 발견 시 알림을 보내는 프로젝트입니다.
+## 프로젝트 개요
 
-주요 기능
----------
-- Selenium을 이용한 웹 스크래핑
-- 머신러닝 모델을 활용한 게시물 예측
-- Discord를 통한 실시간 알림 전송
+**AI-MANAGER**는 특정 갤러리의 게시물을 모니터링하고 부적절한 게시물이 있을 경우 디스코드 메세지를 보내는 프로젝트입니다. 
 
-핵심 특징
----------
-1. 웹 스크래핑: Selenium으로 게시판 글 자동 탐색 및 수집
-2. 예측 분석: 머신 러닝 모델로 주의 필요 게시글 식별
-3. 알림 시스템: 문제성 게시물 감지 시 Discord로 즉시 경고
-4. 유연한 설정: 사용자 지정 가능한 구성 파일 제공
+이 프로젝트는 Selenium을 이용한 웹 스크래핑, 머신러닝 모델을 이용한 예측, 그리고 Discord를 통한 알림 전송 기능을 포함하고 있습니다.
 
-시스템 요구사항
----------------
+## 주요 기능
+
+- **웹 스크래핑**: Selenium을 사용하여 보드에서 게시물을 탐색하고 스크랩합니다.
+- **예측**: 머신 러닝 모델을 활용하여 주의가 필요한 게시글을 식별합니다.
+- **알림**: 문제가 있는 게시물이 감지되면 Discord 채널로 경고를 보냅니다.
+- **구성**: 구성 파일을 통해 사용자 지정할 수 있습니다.
+
+## 설치 및 실행 방법
+
+### 요구 사항
+
 - Python 3.x
 - Selenium
 - BeautifulSoup4
-- TensorFlow (또는 Keras)
+- TensorFlow(또는 Keras)
 - Requests
 - WebDriver Manager
-- Discord 웹훅 (선택사항)
 
-설정 가이드
-------------
+### 설치 및 실행
 
-3. Dcinside 계정 설정 (config/account.txt):
-   YOUR_ACCOUNT_ID
-   YOUR_ACCOUNT_PASSWD
+1. 저장소를 클론합니다.
 
-4. Discord 웹훅 설정 (config/discord.txt):
-   DISCORD_WEBHOOK_URL=YOUR_DISCORD_WEBHOOK_URL
+   ```bash
+   git clone https://github.com/yourusername/ai-manager.git
+   cd ai-manager
+   ```
 
-빠른 시작 가이드
-----------------
-1. 프로젝트 복제:
-   git clone https://github.com/dcinside-ssibal/ai-manager.git
-   cd ai-Manager
+2. ./start.sh에 실행 권한을 부여합니다.
 
-2. 실행 권한 부여:
-   chmod +x start.sh
+   ```bash
+   chmod +x shart.sh
+   ```
 
-3. 프로그램 실행:
+3. 애플리케이션을 실행합니다.
+
+   ```bash
    ./start.sh
+   ```
 
-커스터마이징 옵션
------------------
-- 모니터링 주기: monitor_new_posts 함수에서 시간 간격 조정 (기본 5분)
-- 예측 정확도: 모델 업데이트 또는 재학습으로 성능 개선
+## 개선할 점
 
-트러블슈팅
-----------
-- 알림 문제: 모델 학습 상태와 예측 기능 점검
-- 설정 오류: 구성 파일 내용 재확인
-- 스크래핑 이슈: WebDriver와 스크래핑 로직 업데이트 확인
+현재 AI-MANAGER는 게시물 모니터링과 예측 기능만을 지원합니다. 추가적인 기능을 고려할 수 있습니다:
 
-라이선스
---------
-MIT 라이선스 적용. 상세 내용은 LICENSE 파일 참조.
+1. **모델 성능 개선**:
+   - 머신러닝 모델을 업데이트하거나 재학습하여 예측 성능을 향상시킵니다.
+   - 다양한 데이터로 모델을 테스트하고 튜닝합니다.
 
-문의 및 지원
-------------
-기술 지원 및 문의: https://dcinside-ssibal.github.io/dcinside-ssibal-online-profile/
+2. **알림 기능 개선**:
+   - 알림 메시지를 더 정교하게 설정하여 사용자에게 더 유용한 정보를 제공합니다.
+   - 예를 들어, 문제의 심각도에 따라 알림의 우선순위를 조정합니다.
+
+## 문의
+
+프로젝트와 관련된 문의는 [씨발님의 온라인 프로필](https://dcinside-ssibal.github.io/dcinside-ssibal-online-profile/)를 참고해주세요.
+
+
+## 라이선스
+
+이 프로젝트는 MIT 라이선스에 따라 배포됩니다. 자세한 내용은 LICENSE 파일을 참조하세요.
