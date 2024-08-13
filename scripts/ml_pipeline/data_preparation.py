@@ -8,27 +8,32 @@ import pickle
 import os
 
 def load_data():
-    """Load block and delete lists from JSON files."""
-    with open('data/block_list.json', 'r', encoding='utf-8') as f:
+    """Load block, delete, and normal post lists from JSON files."""
+    with open('data/block.json', 'r', encoding='utf-8') as f:
         block_list = json.load(f)
 
     with open('data/delete_list.json', 'r', encoding='utf-8') as f:
         delete_list = json.load(f)
-        
-    return block_list, delete_list
 
-def preprocess_data(block_list, delete_list):
-    """Preprocess the block and delete lists into training and test datasets."""
+    with open('data/normalpost.json', 'r', encoding='utf-8') as f:
+        normal_posts = json.load(f)
+        
+    return block_list, delete_list, normal_posts
+
+def preprocess_data(block_list, delete_list, normal_posts):
+    """Preprocess the block, delete, and normal post lists into training and test datasets."""
     # Convert lists to DataFrame
     block_df = pd.DataFrame(block_list)
     delete_df = pd.DataFrame(delete_list)
-
+    normal_df = pd.DataFrame(normal_posts)
+    
     # Add labels
     block_df['label'] = 1
     delete_df['label'] = 1
+    normal_df['label'] = 0
 
     # Concatenate the DataFrames
-    data_df = pd.concat([block_df[['post_or_comment', 'label']], delete_df[['post_or_comment', 'label']]])
+    data_df = pd.concat([block_df[['post_or_comment', 'label']], delete_df[['post_or_comment', 'label']], normal_df[['title', 'label']].rename(columns={'title': 'post_or_comment'})])
 
     # Separate texts and labels
     texts = data_df['post_or_comment'].values
@@ -68,8 +73,8 @@ def save_prepared_data(tokenizer, X_train_pad, X_test_pad, y_train, y_test):
 
 def prepare_data():
     """Main function to prepare data."""
-    block_list, delete_list = load_data()
-    X_train, X_test, y_train, y_test = preprocess_data(block_list, delete_list)
+    block_list, delete_list, normal_posts = load_data()
+    X_train, X_test, y_train, y_test = preprocess_data(block_list, delete_list, normal_posts)
     tokenizer, X_train_pad, X_test_pad = tokenize_and_pad(X_train, X_test)
     save_prepared_data(tokenizer, X_train_pad, X_test_pad, y_train, y_test)
 

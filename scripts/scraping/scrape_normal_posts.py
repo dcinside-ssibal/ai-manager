@@ -6,6 +6,7 @@ import json
 import os
 from datetime import datetime, timedelta
 from scripts.utils import load_login_info, setup_driver, load_existing_posts, save_posts
+import re
 
 def get_normal_posts(driver, page):
     url = f'https://gall.dcinside.com/mgallery/board/lists?id=galaxy_tab&page={page}'
@@ -26,8 +27,9 @@ def get_normal_posts(driver, page):
     
     post_data = []
     for post in posts:
-        title = post.find('td', class_='gall_tit').text.strip()
-        link = post.find('td', class_='gall_tit').a['href']
+        title_td = post.find('td', class_='gall_tit')
+        title_text = title_td.text.strip()
+        link = title_td.a['href']
         post_url = f'https://gall.dcinside.com{link}'
         time_text = post.find('td', class_='gall_date')['title'].strip()
         post_time = datetime.strptime(time_text, '%Y-%m-%d %H:%M:%S')
@@ -35,14 +37,20 @@ def get_normal_posts(driver, page):
         view_count = post.find('td', class_='gall_count').text.strip()
         recommend_count = post.find('td', class_='gall_recommend').text.strip()
 
+        # Extract and remove comment count from title
+        comment_match = re.search(r'\n\[(\d+)\]', title_text)
+        comment_count = comment_match.group(1) if comment_match else ''
+        title_cleaned = re.sub(r'\n\[\d+\]$', '', title_text).strip()
+
         if post_time < datetime.now() - timedelta(hours=1):
             post_data.append({
-                'title': title,
+                'title': title_cleaned,
                 'url': post_url,
                 'time': post_time.strftime('%Y-%m-%d %H:%M:%S'),
                 'writer': writer,
                 'view_count': view_count,
-                'recommend_count': recommend_count
+                'recommend_count': recommend_count,
+                'comment': comment_count
             })
     
     return post_data

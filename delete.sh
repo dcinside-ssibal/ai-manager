@@ -18,7 +18,6 @@ delete_files() {
             fi
         done
         if [ "$skip" = false ]; then
-            echo "Deleting file: $file"
             rm "$file"
         fi
     done
@@ -35,7 +34,6 @@ delete_directories() {
             fi
         done
         if [ "$skip" = false ] && [ "$dir" != "$TARGET_DIR" ]; then
-            echo "Deleting directory: $dir"
             rm -r "$dir"
         fi
     done
