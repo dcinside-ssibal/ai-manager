@@ -1,0 +1,16 @@
+# 웹 스크래핑 및 자동화
+selenium
+webdriver-manager
+beautifulsoup4
+
+# 데이터 처리 및 분석
+pandas
+numpy
+requests
+
+# 머신러닝 및 딥러닝
+tensorflow
+scikit-learn
+
+# 스케줄링
+schedule

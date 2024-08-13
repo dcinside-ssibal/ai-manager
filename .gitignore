@@ -1,0 +1,25 @@
+# 파이썬 파일 캐시
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# 가상환경
+venv/
+env/
+ai-manager/
+
+# 데이터 파일
+data/
+
+# 로그 파일
+*.log
+
+# 시스템 파일
+.DS_Store
+*.swp
+
+artifacts/
+config/
+models/
+*.deb
