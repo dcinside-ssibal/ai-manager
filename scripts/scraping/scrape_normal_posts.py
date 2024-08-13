@@ -5,8 +5,8 @@ from bs4 import BeautifulSoup
 import json
 import os
 from datetime import datetime, timedelta
-from scripts.utils import load_login_info, setup_driver, load_existing_posts, save_posts
 import re
+from scripts.utils import load_login_info, setup_driver, load_existing_posts, save_posts
 
 def get_normal_posts(driver, page):
     url = f'https://gall.dcinside.com/mgallery/board/lists?id=galaxy&page={page}'
@@ -55,25 +55,48 @@ def get_normal_posts(driver, page):
     
     return post_data
 
+def load_existing_posts():
+    """Load existing posts from normal_posts.json."""
+    if os.path.exists('data/normal_posts.json'):
+        with open('data/normal_posts.json', 'r', encoding='utf-8') as f:
+            return json.load(f)
+    return []
+
+def save_posts(posts):
+    """Save all posts to normal_posts.json."""
+    os.makedirs('data', exist_ok=True)
+    with open('data/normal_posts.json', 'w', encoding='utf-8') as f:
+        json.dump(posts, f, ensure_ascii=False, indent=4)
+
 def scrape_normal_posts():
     driver = setup_driver()
 
-    normal_posts = load_existing_posts()
-    new_posts = []
-    existing_urls = {post['url'] for post in normal_posts}
+    existing_posts = load_existing_posts()
+    existing_urls = {post['url'] for post in existing_posts}
 
+    all_posts = []
     for page in range(1, 501):
         try:
             recent_posts = get_normal_posts(driver, page)
-            new_posts.extend(post for post in recent_posts if post['url'] not in existing_urls)
+            # Filter out only new posts
+            new_posts = [post for post in recent_posts if post['url'] not in existing_urls]
+            
+            if not new_posts:
+                print(f"No new posts found on page {page}. Stopping the crawl.")
+                break  # Stop the loop if no new posts are found
+
+            all_posts.extend(new_posts)
+
             if page % 50 == 0:
                 message = f"Processed page {page}"
                 print(message)  # 콘솔에 로그를 출력
+
         except Exception as e:
             print(f"Error getting posts from page {page}: {e}")
+            break  # Stop the loop on error
 
-    normal_posts.extend(new_posts)
-    save_posts(normal_posts)
+    existing_posts.extend(all_posts)
+    save_posts(existing_posts)
     driver.quit()
 
 if __name__ == "__main__":

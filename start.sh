@@ -21,11 +21,11 @@ else
     exit 1
 fi
 
-# ChromeDriver 경로 확인
-if ! which chromedriver > /dev/null 2>&1; then
-    echo "ChromeDriver not found."
-    exit 1
-fi
+# WebDriver Manager 설치
+pip install webdriver-manager -q
+
+# ChromeDriver 설치 및 경로 확인
+python3 -c "from webdriver_manager.chrome import ChromeDriverManager; ChromeDriverManager().install()"
 
 # main.py 실행
 echo "Starting program..."

@@ -16,22 +16,21 @@ def load_config(file_path):
             for line in f:
                 key, value = line.strip().split('=')
                 config[key] = value
-    except Exception:
-        pass
+    except Exception as e:
+        print(f"Error loading config: {e}")
     return config
 
 def get_post_time(post):
     time_str = post.find('td', class_='gall_date').text.strip()
     try:
-        # 변환할 날짜와 시간 형식 (이 부분은 실제 게시글 시간 포맷에 맞게 조정해야 할 수 있음)
         return datetime.strptime(time_str, '%Y.%m.%d %H:%M')
     except ValueError:
         return None
 
-def process_posts(posts, ten_minutes_ago, discord_webhook_url):
+def process_posts(posts, five_minutes_ago, discord_webhook_url):
     for post in posts:
         post_time = get_post_time(post)
-        if post_time and post_time >= ten_minutes_ago:
+        if post_time and post_time >= five_minutes_ago:
             title = post.find('td', class_='gall_tit').text.strip()
             link = post.find('td', class_='gall_tit').a['href']
             post_url = f'https://gall.dcinside.com{link}'
@@ -40,6 +39,7 @@ def process_posts(posts, ten_minutes_ago, discord_webhook_url):
                 if predict(title):
                     message = f"문제 있는 게시글 제목 발견: {title}\n{post_url}"
                     send_discord_alert(message, discord_webhook_url)
+                    print(f"Alert sent for post: {title}")
             except Exception as e:
                 print(f"Error predicting or sending alert: {e}")
 
@@ -48,20 +48,23 @@ def monitor_new_posts(discord_webhook_url):
     
     tokenizer, model = load_resources()
     if tokenizer is None or model is None:
+        print("Error loading resources.")
         return
 
     driver = setup_driver()
     if driver is None:
+        print("Error setting up driver.")
         return
     
     user_id, user_password = load_login_info()
     if not user_id or not user_password:
+        print("Error loading login info.")
         driver.quit()
         return
 
     try:
         current_time = datetime.now()
-        ten_minutes_ago = current_time - timedelta(minutes=10)
+        five_minutes_ago = current_time - timedelta(minutes=5)
 
         page_number = 1
         while True:
@@ -70,9 +73,10 @@ def monitor_new_posts(discord_webhook_url):
             posts = soup.find_all('tr', class_='ub-content us-post')
 
             if not posts:
+                print("No more posts found. Exiting.")
                 break
 
-            process_posts(posts, ten_minutes_ago, discord_webhook_url)
+            process_posts(posts, five_minutes_ago, discord_webhook_url)
 
             # 페이지 이동
             page_number += 1
@@ -84,11 +88,13 @@ def monitor_new_posts(discord_webhook_url):
         print(f"Error during monitoring: {e}")
     finally:
         driver.quit()
+        print("Monitoring completed.")
 
 def monitor():
     config = load_config('config/discord.txt')
     discord_webhook_url = config.get('DISCORD_WEBHOOK_URL')
     if not discord_webhook_url:
+        print("No Discord webhook URL found in config.")
         return
 
     monitor_new_posts(discord_webhook_url)

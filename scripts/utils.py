@@ -49,12 +49,12 @@ def login(driver, user_id, user_password):
     driver.get('https://sign.dcinside.com/login')
     
     try:
-        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, 'id')))
+        WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.ID, 'id')))
         driver.find_element(By.ID, 'id').send_keys(user_id)
         driver.find_element(By.ID, 'pw').send_keys(user_password)
         driver.find_element(By.CLASS_NAME, 'btn_blue').click()
 
-        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, 'btn_grey')))
+        WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CLASS_NAME, 'btn_grey')))
         next_time_buttons = driver.find_elements(By.CLASS_NAME, 'btn_grey')
         if next_time_buttons:
             next_time_buttons[1].click()

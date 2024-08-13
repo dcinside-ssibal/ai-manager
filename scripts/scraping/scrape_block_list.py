@@ -48,11 +48,21 @@ def get_block_list(driver, page):
         })
     return data_list
 
+def load_existing_data():
+    """Load existing data from block_list.json."""
+    if os.path.exists('data/block_list.json'):
+        with open('data/block_list.json', 'r', encoding='utf-8') as f:
+            return json.load(f)
+    return []
+
 def scrape_block_list():
     user_id, user_password = load_login_info()
     driver = setup_driver()
     login(driver, user_id, user_password)
 
+    existing_data = load_existing_data()
+    existing_numbers = {item['number'] for item in existing_data}
+    
     block_data = []
     page = 1
     while True:
@@ -60,7 +70,15 @@ def scrape_block_list():
             current_block_data = get_block_list(driver, page)
             if not current_block_data:
                 break  # Stop if no data is returned, indicating no more pages
-            block_data.extend(current_block_data)
+
+            # Check if current data is already in existing data
+            new_data = [item for item in current_block_data if item['number'] not in existing_numbers]
+            
+            if not new_data:
+                print(f"No new block data found on page {page}. Stopping the crawl.")
+                break  # Stop if all current data is already in the existing data
+            
+            block_data.extend(new_data)
 
             # 50페이지마다 로그를 보냄
             if page % 50 == 0:
@@ -75,9 +93,10 @@ def scrape_block_list():
             print(f"Error getting block list from page {page}: {e}")
             break  # Stop the loop on error
 
-    os.makedirs('data', exist_ok=True)
-    with open('data/block_list.json', 'w', encoding='utf-8') as f:
-        json.dump(block_data, f, ensure_ascii=False, indent=4)
+    if block_data:
+        os.makedirs('data', exist_ok=True)
+        with open('data/block_list.json', 'w', encoding='utf-8') as f:
+            json.dump(existing_data + block_data, f, ensure_ascii=False, indent=4)
 
     print("Complete Block List")
     driver.quit()
