@@ -36,7 +36,7 @@ def monitor_new_posts(discord_webhook_url):
         discord_webhook_url (str): The URL for Discord webhook.
     """
     print("Starting to monitor new posts...")
-    config = load_config('config/discord_config.txt')
+    config = load_config('config/discord.txt')
     
     # Load the model and tokenizer
     tokenizer, model = load_resources()
@@ -89,7 +89,7 @@ def monitor():
     """
     Loads configuration and starts the monitoring process.
     """
-    config = load_config('config/discord_config.txt')
+    config = load_config('config/discord.txt')
     discord_webhook_url = config.get('DISCORD_WEBHOOK_URL')
     if not discord_webhook_url:
         print("Discord webhook URL not configured.")

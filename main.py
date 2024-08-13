@@ -46,7 +46,7 @@ def main():
     Main function to execute the entire process: scraping, data preparation, model training, and scheduling.
     """
     # Load configuration from file
-    config = load_config('config/discord_config.txt')
+    config = load_config('config/discord.txt')
     discord_webhook_url = config.get('DISCORD_WEBHOOK_URL')
     if not discord_webhook_url:
         print("Error: Discord webhook URL is not configured.")
@@ -68,15 +68,6 @@ def main():
     train_model()
     print("Model training completed.")
     
-    # Prediction example
-    print("Starting prediction...")
-    tokenizer, model = load_resources()
-    if tokenizer and model:
-        prediction_result = predict_text("예시 텍스트", tokenizer, model)
-        print(f"Prediction result: {prediction_result}")
-    else:
-        print("Error: Failed to load resources for prediction.")
-    print("Prediction completed.")
     
     # Start the scraping schedule in a separate thread
     try:
