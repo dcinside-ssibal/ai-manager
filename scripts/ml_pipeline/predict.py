@@ -7,6 +7,7 @@ tokenizer = None
 model = None
 
 def load_resources():
+    """Load tokenizer and model from files."""
     global tokenizer, model
     if tokenizer is None or model is None:
         print("Loading resources...")
@@ -19,12 +20,12 @@ def load_resources():
             print("Model loaded successfully.")
         except Exception as e:
             print(f"Error loading resources: {e}")
-            # 예외 발생 시 None을 반환하지 않고 튜플을 반환
             tokenizer = None
             model = None
     return tokenizer, model
 
 def preprocess_text(text):
+    """Preprocess text for model prediction."""
     print(f"Preprocessing text: {text}")
     try:
         sequences = tokenizer.texts_to_sequences([text])
@@ -35,7 +36,8 @@ def preprocess_text(text):
         print(f"Error preprocessing text: {e}")
         return None
 
-def predict_text(text, tokenizer, model):
+def predict_text(text):
+    """Predict if the given text is problematic."""
     print(f"Predicting text: {text}")
     try:
         processed_text = preprocess_text(text)
@@ -50,6 +52,9 @@ def predict_text(text, tokenizer, model):
         print(f"Error predicting text: {e}")
         return False
 
-def predict(title, tokenizer, model):
+def predict(title):
+    """Run prediction for the given title."""
     print(f"Running prediction for title: {title}")
-    return predict_text(title, tokenizer, model)
+    # Ensure resources are loaded
+    load_resources()
+    return predict_text(title)
