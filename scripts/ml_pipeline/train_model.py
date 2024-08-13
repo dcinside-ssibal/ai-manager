@@ -43,5 +43,5 @@ def train_model():
 
     # Save the model
     os.makedirs('models', exist_ok=True)
-    model.save('models/text_classification_model.h5')
+    model.save('models/text_classification_model.keras')
     print("Model training and saving completed.")

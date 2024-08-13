@@ -7,6 +7,7 @@ import json
 import os
 from datetime import datetime
 from scripts.utils import load_login_info, setup_driver, login
+from scripts.discord_alert import send_discord_alert
 
 def parse_processing_info(text):
     date = re.search(r'\d{4}\.\d{2}\.\d{2}', text)
@@ -15,7 +16,7 @@ def parse_processing_info(text):
     return f"{date.group(0) if date else ''} {time.group(0) if time else ''}", handler.group(1) if handler else ''
 
 def get_block_list(driver, page):
-    url = f'https://gall.dcinside.com/mgallery/management/block?id=galaxy_tab&p={page}'
+    url = f'https://gall.dcinside.com/mgallery/management/block?id=galaxy&p={page}'
     driver.get(url)
     
     WebDriverWait(driver, 10).until(
@@ -28,6 +29,9 @@ def get_block_list(driver, page):
         return []
 
     rows = table.find('tbody').find_all('tr')
+    if not rows:
+        return []  # Return empty list if no rows are found, indicating no more pages
+
     data_list = []
     for row in rows:
         cols = row.find_all('td')
@@ -50,16 +54,32 @@ def scrape_block_list():
     login(driver, user_id, user_password)
 
     block_data = []
-    for page in range(1, 5):
+    page = 1
+    while True:
         try:
-            block_data.extend(get_block_list(driver, page))
+            current_block_data = get_block_list(driver, page)
+            if not current_block_data:
+                break  # Stop if no data is returned, indicating no more pages
+            block_data.extend(current_block_data)
+
+            # 50페이지마다 로그를 보냄
+            if page % 50 == 0:
+                message = f"Processed page {page}"
+                print(message)  # 콘솔에 로그를 출력
+                # Uncomment the following line to send a Discord alert instead
+                # send_discord_alert(message, discord_webhook_url)
+
+            page += 1
+
         except Exception as e:
             print(f"Error getting block list from page {page}: {e}")
+            break  # Stop the loop on error
 
     os.makedirs('data', exist_ok=True)
     with open('data/block_list.json', 'w', encoding='utf-8') as f:
         json.dump(block_data, f, ensure_ascii=False, indent=4)
 
+    print("Complete Block List")
     driver.quit()
 
 if __name__ == "__main__":

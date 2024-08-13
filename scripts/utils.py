@@ -58,7 +58,6 @@ def login(driver, user_id, user_password):
         next_time_buttons = driver.find_elements(By.CLASS_NAME, 'btn_grey')
         if next_time_buttons:
             next_time_buttons[1].click()
-        print("Login completed.")
     except Exception as e:
         print(f"Error during login: {e}")
         with open('debug_login_page_source.html', 'w', encoding='utf-8') as f:

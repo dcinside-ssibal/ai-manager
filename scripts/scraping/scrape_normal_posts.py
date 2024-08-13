@@ -9,7 +9,7 @@ from scripts.utils import load_login_info, setup_driver, load_existing_posts, sa
 import re
 
 def get_normal_posts(driver, page):
-    url = f'https://gall.dcinside.com/mgallery/board/lists?id=galaxy_tab&page={page}'
+    url = f'https://gall.dcinside.com/mgallery/board/lists?id=galaxy&page={page}'
     driver.get(url)
     
     try:
@@ -62,10 +62,13 @@ def scrape_normal_posts():
     new_posts = []
     existing_urls = {post['url'] for post in normal_posts}
 
-    for page in range(1, 5):
+    for page in range(1, 501):
         try:
             recent_posts = get_normal_posts(driver, page)
             new_posts.extend(post for post in recent_posts if post['url'] not in existing_urls)
+            if page % 50 == 0:
+                message = f"Processed page {page}"
+                print(message)  # 콘솔에 로그를 출력
         except Exception as e:
             print(f"Error getting posts from page {page}: {e}")
 

@@ -8,7 +8,7 @@ import os
 from scripts.utils import load_login_info, setup_driver, login
 
 def get_delete_list(driver, page):
-    url = f'https://gall.dcinside.com/mgallery/management/delete?id=galaxy_tab&p={page}'
+    url = f'https://gall.dcinside.com/mgallery/management/delete?id=galaxy&p={page}'
     driver.get(url)
     
     WebDriverWait(driver, 10).until(
@@ -19,8 +19,11 @@ def get_delete_list(driver, page):
     table = soup.find('table', {'class': 'minor_block_list del'})
     if not table:
         return []
-    
+
     rows = table.find('tbody').find_all('tr')
+    if not rows:
+        return []  # Return empty list if no rows are found, indicating no more pages
+
     data_list = []
     for row in rows:
         cols = row.find_all('td')
@@ -40,16 +43,27 @@ def scrape_delete_list():
     login(driver, user_id, user_password)
 
     delete_data = []
-    for page in range(1, 5):
+    page = 1
+    while True:
         try:
-            delete_data.extend(get_delete_list(driver, page))
+            current_delete_data = get_delete_list(driver, page)
+            if not current_delete_data:
+                break  # Stop if no data is returned, indicating no more pages
+            delete_data.extend(current_delete_data)
+            page += 1
+            
+            if page % 50 == 0:
+                message = f"Processed page {page}"
+                print(message)  # 콘솔에 로그를 출력
         except Exception as e:
             print(f"Error getting delete list from page {page}: {e}")
+            break  # Stop the loop on error
 
     os.makedirs('data', exist_ok=True)
     with open('data/delete_list.json', 'w', encoding='utf-8') as f:
         json.dump(delete_data, f, ensure_ascii=False, indent=4)
 
+    print("Complete Delete List")
     driver.quit()
 
 if __name__ == "__main__":
