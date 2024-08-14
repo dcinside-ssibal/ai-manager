@@ -26,13 +26,28 @@
    cd ai-manager
    ```
 
-2. ./start.sh에 실행 권한을 부여합니다.
+2. config 폴더에 필요한 설정 파일을 추가합니다.
+
+   config/account.txt: Dcinside 로그인 정보가 포함된 파일입니다. 파일에는 다음과 같이 로그인 정보를 입력합니다:
+
+      ```txt
+      INPUT_YOUR_DCINSIDE_ID
+      INPUT_YOUR_DCINSIDE_PW
+      ```
+
+   config/discord.txt: Discord 웹훅 URL이 포함된 파일입니다. 파일에는 다음과 같이 웹훅 URL을 입력합니다:
+      
+      ```txt
+      DISCORD_WEBHOOK_URL=INPUT_YOUR_DISCORD_WEBHOOK
+      ```
+
+3. ./start.sh에 실행 권한을 부여합니다.
 
    ```bash
-   chmod +x shart.sh
+   chmod +x start.sh
    ```
 
-3. 애플리케이션을 실행합니다.
+4. 애플리케이션을 실행합니다.
 
    ```bash
    ./start.sh
