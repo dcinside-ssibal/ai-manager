@@ -1,3 +1,4 @@
+import os
 import threading
 import schedule
 import time
@@ -11,8 +12,12 @@ from scripts import (
 def setup_schedule(discord_webhook_url):
     """스케줄을 설정합니다."""
     schedule.every().day.at("00:00").do(scrape_block_list)
-    schedule.every().day.at("01:00").do(scrape_delete_list)
-    schedule.every().day.at("02:00").do(scrape_normal_posts)
+    schedule.every().day.at("00:30").do(scrape_delete_list)
+    schedule.every().day.at("01:00").do(scrape_normal_posts)
+    
+    schedule.every().day.at("01:30").do(prepare_data)
+    schedule.every().day.at("02:00").do(train_model)
+
     schedule.every(5).minutes.do(lambda: monitor_new_posts(discord_webhook_url))
 
 def run_schedule(discord_webhook_url):
@@ -46,9 +51,17 @@ def main():
     print("스크래핑 완료")
     
     print("모델 준비 시작")
-    prepare_data()
-    train_model()
-    print("모델 준비 완료")
+    
+    model_path = 'models/text_classification_model.keras'
+    if not os.path.exists(model_path):
+        # 모델이 존재하지 않으면 데이터 준비 및 모델 학습
+        prepare_data()
+        train_model()
+        print("모델 학습 완료")
+    else:
+        print("모델이 이미 존재합니다. 모델 학습을 건너뜁니다.")
+
+    monitor_new_posts(discord_webhook_url)
 
     try:
         schedule_thread = threading.Thread(target=lambda: run_schedule(discord_webhook_url), name='ScheduleThread')
