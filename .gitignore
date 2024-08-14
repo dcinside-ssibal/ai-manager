@@ -14,12 +14,13 @@ data/
 
 # 로그 파일
 *.log
+*.html
 
 # 시스템 파일
 .DS_Store
 *.swp
 
+# 아티팩트 및 설정 파일
 artifacts/
-config/
 models/
 *.deb

@@ -5,9 +5,7 @@ from bs4 import BeautifulSoup
 import re
 import json
 import os
-from datetime import datetime
 from scripts.utils import load_login_info, setup_driver, login
-from scripts.discord_alert import send_discord_alert
 
 def parse_processing_info(text):
     date = re.search(r'\d{4}\.\d{2}\.\d{2}', text)
@@ -18,20 +16,12 @@ def parse_processing_info(text):
 def get_block_list(driver, page):
     url = f'https://gall.dcinside.com/mgallery/management/block?id=galaxy&p={page}'
     driver.get(url)
-    
-    WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.CLASS_NAME, 'minor_block_list'))
-    )
-
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, 'minor_block_list')))
     soup = BeautifulSoup(driver.page_source, 'html.parser')
     table = soup.find('table', {'class': 'minor_block_list'})
     if not table:
         return []
-
     rows = table.find('tbody').find_all('tr')
-    if not rows:
-        return []  # Return empty list if no rows are found, indicating no more pages
-
     data_list = []
     for row in rows:
         cols = row.find_all('td')
@@ -49,7 +39,6 @@ def get_block_list(driver, page):
     return data_list
 
 def load_existing_data():
-    """Load existing data from block_list.json."""
     if os.path.exists('data/block_list.json'):
         with open('data/block_list.json', 'r', encoding='utf-8') as f:
             return json.load(f)
@@ -66,39 +55,20 @@ def scrape_block_list():
     block_data = []
     page = 1
     while True:
-        try:
-            current_block_data = get_block_list(driver, page)
-            if not current_block_data:
-                break  # Stop if no data is returned, indicating no more pages
-
-            # Check if current data is already in existing data
-            new_data = [item for item in current_block_data if item['number'] not in existing_numbers]
-            
-            if not new_data:
-                print(f"No new block data found on page {page}. Stopping the crawl.")
-                break  # Stop if all current data is already in the existing data
-            
-            block_data.extend(new_data)
-
-            # 50페이지마다 로그를 보냄
-            if page % 50 == 0:
-                message = f"Processed page {page}"
-                print(message)  # 콘솔에 로그를 출력
-                # Uncomment the following line to send a Discord alert instead
-                # send_discord_alert(message, discord_webhook_url)
-
-            page += 1
-
-        except Exception as e:
-            print(f"Error getting block list from page {page}: {e}")
-            break  # Stop the loop on error
+        current_block_data = get_block_list(driver, page)
+        if not current_block_data:
+            break
+        new_data = [item for item in current_block_data if item['number'] not in existing_numbers]
+        if not new_data:
+            break
+        block_data.extend(new_data)
+        page += 1
 
     if block_data:
         os.makedirs('data', exist_ok=True)
         with open('data/block_list.json', 'w', encoding='utf-8') as f:
             json.dump(existing_data + block_data, f, ensure_ascii=False, indent=4)
 
-    print("Complete Block List")
     driver.quit()
 
 if __name__ == "__main__":
