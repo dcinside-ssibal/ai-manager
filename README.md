@@ -41,7 +41,7 @@
       DISCORD_WEBHOOK_URL=INPUT_YOUR_DISCORD_WEBHOOK
       ```
 
-3. ./start.sh에 실행 권한을 부여합니다.
+3. start.sh에 실행 권한을 부여합니다.
 
    ```bash
    chmod +x start.sh
